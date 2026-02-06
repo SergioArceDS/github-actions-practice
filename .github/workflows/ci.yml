@@ -1,0 +1,36 @@
+name: Java CI practice
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Descargar repo
+      uses: actions/checkout@v4
+    
+    - name: Instalar java 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        cache: maven
+        
+    - name: Compilar proyecto con maven
+      run: mvn clean install
+
+    - name: Contruir imagen de Docker
+      uses: mr-smithers-excellent/docker-build-push@v6
+      with:
+        image: sergioarce/github-actions-demo-image
+        tags: latest
+        registry: docker.io
+        dockerfile: Dockerfile
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
